@@ -5,12 +5,12 @@ using RacketsScrapper.Infrastructure;
 
 var serviceProvider = new ServiceCollection()
             .AddDbContext<RacketDbContext>(opt => opt.UseSqlServer("Data Source = AK24730\\MSSQLSERVER01; Initial Catalog= db_racchette; Integrated Security=true; TrustServerCertificate=True"))
-            .AddScoped<IRacketsScrapperService, RacketsScrapperService>()
+            .AddScoped<ITennisPointScraperService, TennisPointScraperService>()
             .AddScoped<IDownloaderService, DownloaderService>()
             .AddScoped<IRacketsRepository, RacketRepository>()
             .BuildServiceProvider();
 
-IRacketsScrapperService? _racketsScrapper = serviceProvider.GetService<IRacketsScrapperService>();
+ITennisPointScraperService? _racketsScrapper = serviceProvider.GetService<ITennisPointScraperService>();
 _racketsScrapper.GetPageHtmlCode("https://www.tennis-point.it/padel-racchette-da-padel/?start=0&sz=36");
 string ?url = _racketsScrapper.getNextPageLink();
 while (url != null)

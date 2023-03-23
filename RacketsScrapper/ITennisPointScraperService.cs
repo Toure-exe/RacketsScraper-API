@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RacketsScrapper.Application
 {
-    public interface IRacketsScrapperService
+    public interface ITennisPointScraperService
     {
         public void ReadAllRacketsLinks();
         public void TakeRacketsData();

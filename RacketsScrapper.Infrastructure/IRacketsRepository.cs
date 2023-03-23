@@ -13,5 +13,11 @@ namespace RacketsScrapper.Infrastructure
 
         public Racket GetRacketById(int id);
 
+        public bool DeleteAllRackets();
+
+        public bool DeleteRacket(Racket racket);
+
+        public bool UpdateRacket(Racket racket);
+
     }
 }

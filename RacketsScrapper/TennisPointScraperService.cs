@@ -10,7 +10,7 @@ using System.Xml.Linq;
 
 namespace RacketsScrapper.Application
 {
-    public class RacketsScrapperService : IRacketsScrapperService
+    public class TennisPointScraperService : ITennisPointScraperService
     {
         private readonly List<string> links;
         public string CurruentPageCode { get; set; }
@@ -19,7 +19,7 @@ namespace RacketsScrapper.Application
         private int page;
         public bool NextPage { get; set; }
 
-        public RacketsScrapperService(IDownloaderService downloaderService, IRacketsRepository racketsRepository)
+        public TennisPointScraperService(IDownloaderService downloaderService, IRacketsRepository racketsRepository)
         {
             _downloaderService = downloaderService;
             _racketRepository = racketsRepository;
@@ -55,6 +55,7 @@ namespace RacketsScrapper.Application
             foreach(string url in this.links)
             {
                 Racket racket = new Racket();
+                racket.Url = url;
                 string detailPage = _downloaderService.DownloadHtmlAsync(url).Result;
                 HtmlDocument doc = new HtmlDocument();
                 doc.LoadHtml(detailPage);

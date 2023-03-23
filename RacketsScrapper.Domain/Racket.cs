@@ -28,6 +28,8 @@ namespace RacketsScrapper.Domain
 
         public string? TipoDiGioco { get; set; }
 
+        public string? Url { get; set; }
+
         public string? TipoDiProdotto { get; set; }
 
         public string? Telaio { get; set; }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RacketsScrapper.Domain;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +13,10 @@ namespace RacketsScrapper.Infrastructure
     {
         public DbSet<Racket> Rackets { get; set; }
         /*
-         *  faccio Add-Migration o update-database con il costruttore mi esce un errore
+         *  se faccio Add-Migration o update-database con il costruttore mi esce un errore (console app)
          */
-
-       /* public RacketDbContext(DbContextOptions<RacketDbContext> options) : base(options)
+       // private readonly IConfiguration _configuration;
+        public RacketDbContext(DbContextOptions<RacketDbContext> options) : base(options)
         {
 
         }
@@ -23,7 +24,7 @@ namespace RacketsScrapper.Infrastructure
         public RacketDbContext()
         {
             
-        }*/
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
