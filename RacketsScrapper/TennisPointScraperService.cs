@@ -10,7 +10,7 @@ using System.Xml.Linq;
 
 namespace RacketsScrapper.Application
 {
-    public class TennisPointScraperService : ITennisPointScraperService
+    public class TennisPointScraperService : IRacketScraperService
     {
         private readonly List<string> links;
         public string CurruentPageCode { get; set; }
@@ -19,13 +19,14 @@ namespace RacketsScrapper.Application
         private int page;
         public bool NextPage { get; set; }
 
-        public TennisPointScraperService(IDownloaderService downloaderService, IRacketsRepository racketsRepository)
+        public TennisPointScraperService(IDownloaderService downloaderService, IRacketsRepository racketsRepository, ICacheService cacheService)
         {
             _downloaderService = downloaderService;
             _racketRepository = racketsRepository;
             links = new List<string>();
             NextPage = true;
             page = 0;
+            CurruentPageCode = string.Empty;
         }
 
         public List<string> getLinkList() => this.links;
@@ -67,6 +68,10 @@ namespace RacketsScrapper.Application
                 racket.Prezzo = double.Parse(price);
                 detailNode = doc.DocumentNode.SelectSingleNode("//*[@class =\"attr-value product-id\"]");
                 racket.NumeroArticolo = detailNode.InnerText;
+                detailNode = doc.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div[2]/div[1]/div/div[1]/div/h1/span[1]/span");
+                racket.Marca = detailNode.InnerText;
+                detailNode = doc.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div[2]/div[1]/div/div[1]/div/h1/span[2]");
+                racket.Modello = detailNode.InnerText;
                 //
                 var listNodes = doc.DocumentNode.SelectNodes("//*[@id=\"tabAttributes\"]/div/div[5]/ul/ul/li/span");
                 for (int i = 0; i < listNodes.Count-2; i += 2)
@@ -131,6 +136,11 @@ namespace RacketsScrapper.Application
         {
             page++;
             CurruentPageCode = _downloaderService.DownloadHtmlAsync(url).Result;
+        }
+
+        public string GetCurrentPageUrl()
+        {
+            throw new NotImplementedException();
         }
     }
 }

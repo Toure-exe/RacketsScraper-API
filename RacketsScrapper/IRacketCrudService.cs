@@ -16,5 +16,10 @@ namespace RacketsScrapper.Application
         public bool ModifyRacket(Racket racket);
 
         public Racket GetRacketById(int id);
+
+        public IEnumerable<Racket> GetAllRackets();
+
+        public IEnumerable<Racket> GetTenRackets();
+        IEnumerable<Racket> GetRacketByName(string name);
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RacketsScrapper.Application
 {
-    public interface ITennisPointScraperService
+    public interface IRacketScraperService
     {
         public void ReadAllRacketsLinks();
         public void TakeRacketsData();
@@ -17,6 +17,8 @@ namespace RacketsScrapper.Application
         public List<string> getLinkList();
 
         public int GetCurrentPage();
+
+        public string GetCurrentPageUrl();
 
         public void CleanLinkList();
 

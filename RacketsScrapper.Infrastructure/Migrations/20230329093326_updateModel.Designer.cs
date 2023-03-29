@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RacketsScrapper.Infrastructure;
 
@@ -10,9 +11,11 @@ using RacketsScrapper.Infrastructure;
 namespace RacketsScrapper.Infrastructure.Migrations
 {
     [DbContext(typeof(RacketDbContext))]
-    partial class RacketDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230329093326_updateModel")]
+    partial class updateModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

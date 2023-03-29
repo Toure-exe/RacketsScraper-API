@@ -8,6 +8,10 @@ namespace RacketsScrapper.Domain
 
         public double Prezzo { get; set; }
 
+        public string? Marca { get; set; }
+
+        public string? Modello { get; set; }
+
         public string? Sesso { get;set; }
 
         public string? ImageLink { get; set; }
@@ -22,7 +26,7 @@ namespace RacketsScrapper.Domain
 
         public string? Peso { get; set; }
 
-        public string NumeroArticolo { get; set; }
+        public string? NumeroArticolo { get; set; }
 
         public int PuntoDiEquilibrio { get; set; }
 

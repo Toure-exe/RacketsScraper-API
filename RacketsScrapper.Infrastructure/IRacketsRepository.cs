@@ -11,13 +11,19 @@ namespace RacketsScrapper.Infrastructure
     {
         public bool InsertRacket(Racket racket);
 
-        public Racket GetRacketById(int id);
+        public Racket? GetRacketById(int id);
 
         public bool DeleteAllRackets();
+
+        public IEnumerable<Racket> GetTenRackets();
 
         public bool DeleteRacket(Racket racket);
 
         public bool UpdateRacket(Racket racket);
+
+        public IEnumerable<Racket> GetAllRackets();
+
+        IEnumerable<Racket> GetRacketByName(string name);
 
     }
 }

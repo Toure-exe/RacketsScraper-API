@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using RacketsScrapper.Application;
 using RacketsScrapper.Domain;
 
@@ -11,12 +12,12 @@ namespace RacketScrapper.API.Controllers
     public class RacketController : ControllerBase
     {
 
-        private readonly IServiceDispatcher _servideDispatcher;
+        private readonly IServiceDispatcher _serviceDispatcher;
         private readonly IRacketCrudService _racketCrudService;
 
         public RacketController(IServiceDispatcher serviceDispatcher, IRacketCrudService racketCrudService)
         {
-            _servideDispatcher = serviceDispatcher;
+            _serviceDispatcher = serviceDispatcher;
             _racketCrudService = racketCrudService;
         }
 
@@ -24,18 +25,26 @@ namespace RacketScrapper.API.Controllers
         [HttpPost("tennis-point/scrap")]
         public void GetDataFromTennisPoint()
         {
-            _servideDispatcher.RunTennisPointScraper();
+            // _racketCrudService.DeleteAllRackets();
+            _serviceDispatcher.RunTennisPointScraper();
+        }
+
+        [HttpPost("padel-nuestro/scrap")]
+        public void GetDataFromPadelNuestro()
+        {
+            // _racketCrudService.DeleteAllRackets();
+            _serviceDispatcher.RunPadelNuestroScraper();
         }
 
         // DELETE api/<RacketController>/5
-        [HttpDelete("tennis-point/{id}")]
+        [HttpDelete("{id}")]
         public IActionResult DeleteRacketById(int id)
         {
             return _racketCrudService.DeleteRacketbyId(id) ? Ok() : StatusCode(500);
         }
 
         // DELETE api/<RacketController>/5
-        [HttpDelete("tennis-point")]
+        [HttpDelete]
         public IActionResult DeleteAllRacket()
         {
             return _racketCrudService.DeleteAllRackets() ? Ok() : StatusCode(500);
@@ -43,27 +52,38 @@ namespace RacketScrapper.API.Controllers
 
 
         // GET: api/<RacketController>
-        [HttpGet("tennis-point")]
-        public IEnumerable<string> Get()
+        [EnableCors("corsPolicy")]
+        [HttpGet]
+        public IActionResult GetAllRackets()
         {
-            return new string[] { "value1", "value2" };
+            IEnumerable<Racket> result = _racketCrudService.GetTenRackets();
+            return (result != null && result.Any()) ? Ok(result) : NotFound();
         }
 
         // GET api/<RacketController>/5
-        [HttpGet("tennis-point/{id}")]
+        [HttpGet("{id}")]
         public IActionResult GetRacketById(int id)
         {
             Racket result = _racketCrudService.GetRacketById(id);
-            return (result != null)  ? Ok(result) : NotFound();
+            return (result != null) ? Ok(result) : NotFound();
+            
+        }
+
+        [HttpGet("search/{name}")]
+        public IActionResult GetRacketByName(string name)
+        {
+            IEnumerable<Racket> result = _racketCrudService.GetRacketByName(name);
+            return (result != null) ? Ok(result) : NotFound();
+
         }
 
         // PUT api/<RacketController>/5
-        [HttpPut("tennis-point/{id}")]
+        [HttpPut("{id}")]
         public IActionResult ModifyRacket(int id, [FromBody] Racket value)
         {
             value.RacketId = id;
-           return _racketCrudService.ModifyRacket(value) ? Ok() : StatusCode(500);
+            return _racketCrudService.ModifyRacket(value) ? Ok() : StatusCode(500);
         }
- 
+
     }
 }

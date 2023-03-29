@@ -21,10 +21,20 @@ namespace RacketsScrapper.Application
            return _racketsRepository.DeleteAllRackets();
         }
 
+        public IEnumerable<Racket> GetTenRackets()
+        {
+           return  _racketsRepository.GetTenRackets();
+        }
+
         public bool DeleteRacketbyId(int id)
         {
            Racket toDelete = _racketsRepository.GetRacketById(id);
-            return _racketsRepository.DeleteRacket(toDelete);
+           return (toDelete != null) ?_racketsRepository.DeleteRacket(toDelete) : false;
+        }
+
+        public IEnumerable<Racket> GetAllRackets()
+        {
+            return _racketsRepository.GetAllRackets();
         }
 
         public Racket GetRacketById(int id)
@@ -35,6 +45,11 @@ namespace RacketsScrapper.Application
         public bool ModifyRacket(Racket racket)
         {
             return _racketsRepository.UpdateRacket(racket);
+        }
+
+        public IEnumerable<Racket> GetRacketByName(string name)
+        {
+           return _racketsRepository.GetRacketByName(name);
         }
     }
 }
