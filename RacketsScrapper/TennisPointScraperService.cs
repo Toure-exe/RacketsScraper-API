@@ -3,10 +3,12 @@ using RacketsScrapper.Domain;
 using RacketsScrapper.Infrastructure;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace RacketsScrapper.Application
 {
@@ -66,7 +68,15 @@ namespace RacketsScrapper.Application
                 detailNode = doc.DocumentNode.SelectSingleNode("//*[@itemprop=\"price\"]/@content");
                 price = detailNode.Attributes["content"].Value;
                 racket.Prezzo = double.Parse(price);
-                detailNode = doc.DocumentNode.SelectSingleNode("//*[@class =\"attr-value product-id\"]");
+                if(doc.DocumentNode.SelectNodes("/html/body/div[1]/div[3]/div[2]/div[3]/div/div[1]/div/span[1]/span/span").Count > 1)
+                {
+                    detailNode = doc.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div[2]/div[3]/div/div[1]/div/span[1]/span[1]/span");
+                    if (detailNode != null)
+                        racket.VecchioPrezzo = double.Parse(detailNode.InnerText.Replace("&euro;", string.Empty).Replace(",", "."));
+                }
+                
+                    
+                detailNode = doc.DocumentNode.SelectSingleNode("//*[@class =\"attr-value product-id\"]");          
                 racket.NumeroArticolo = detailNode.InnerText;
                 detailNode = doc.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div[2]/div[1]/div/div[1]/div/h1/span[1]/span");
                 racket.Marca = detailNode.InnerText;

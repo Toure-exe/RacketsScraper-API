@@ -98,6 +98,9 @@ namespace RacketsScrapper.Application
                 HtmlDocument doc = new HtmlDocument();
                 doc.LoadHtml(detailPage);
                 racket.Prezzo = double.Parse((doc.DocumentNode.SelectSingleNode("//*[@id=\"precio_articulo\"]/@content")).Attributes["content"].Value);
+                var detailNode = doc.DocumentNode.SelectSingleNode("//*[@id=\"bodyContent\"]/form/div/div/div/div[1]/ol/li[2]/div/div[2]/div[3]/div/p/span/del");
+                if (detailNode is not null)
+                    racket.VecchioPrezzo = double.Parse(detailNode.InnerText.Replace("&#8364;", string.Empty).Replace(",", "."));
                 racket.ImageLink = (doc.DocumentNode.SelectSingleNode("//*[@id=\"piGal\"]/ul[1]/li[1]/a/@href")).Attributes["href"].Value;
                 racket.Marca = doc.DocumentNode.SelectSingleNode("//*[@id=\"bodyContent\"]/form/div/div/div/div[1]/ol/li[2]/div/div[2]/div[3]/h1/span").InnerText;            
                 var titles = doc.DocumentNode.SelectNodes("//*[@id=\"bodyContent\"]/form/div/div/div/div[1]/ol/li[1]/div[2]/div/div[2]/table/tbody/tr/td[1]/b");

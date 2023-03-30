@@ -21,9 +21,10 @@ namespace RacketsScrapper.Infrastructure
 
         public bool UpdateRacket(Racket racket);
 
-        public IEnumerable<Racket> GetAllRackets();
+        public ResponseObject GetAllRackets(int currentPage);
 
         IEnumerable<Racket> GetRacketByName(string name);
-
+        IEnumerable<Racket> OrderByPriceAsc(IEnumerable<Racket> values);
+        IEnumerable<Racket> OrderByPriceDesc(IEnumerable<Racket> values);
     }
 }

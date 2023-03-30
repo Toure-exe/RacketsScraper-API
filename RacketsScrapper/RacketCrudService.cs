@@ -32,9 +32,9 @@ namespace RacketsScrapper.Application
            return (toDelete != null) ?_racketsRepository.DeleteRacket(toDelete) : false;
         }
 
-        public IEnumerable<Racket> GetAllRackets()
+        public ResponseObject GetAllRackets(int currentPage)
         {
-            return _racketsRepository.GetAllRackets();
+            return _racketsRepository.GetAllRackets(currentPage);
         }
 
         public Racket GetRacketById(int id)
@@ -50,6 +50,16 @@ namespace RacketsScrapper.Application
         public IEnumerable<Racket> GetRacketByName(string name)
         {
            return _racketsRepository.GetRacketByName(name);
+        }
+
+        public IEnumerable<Racket> OrderByPriceAsc(IEnumerable<Racket> values)
+        {
+            return _racketsRepository.OrderByPriceAsc(values);
+        }
+
+        public IEnumerable<Racket> OrderByPriceDesc(IEnumerable<Racket> values)
+        {
+            return _racketsRepository.OrderByPriceDesc(values);
         }
     }
 }

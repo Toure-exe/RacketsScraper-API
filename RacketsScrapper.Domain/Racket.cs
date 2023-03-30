@@ -8,6 +8,8 @@ namespace RacketsScrapper.Domain
 
         public double Prezzo { get; set; }
 
+        public double VecchioPrezzo { get; set; }
+
         public string? Marca { get; set; }
 
         public string? Modello { get; set; }

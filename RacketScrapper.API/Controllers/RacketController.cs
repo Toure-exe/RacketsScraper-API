@@ -53,11 +53,12 @@ namespace RacketScrapper.API.Controllers
 
         // GET: api/<RacketController>
         [EnableCors("corsPolicy")]
-        [HttpGet]
-        public IActionResult GetAllRackets()
+        [HttpGet("rackets/{currentPage}")]
+        public IActionResult GetAllRackets(int currentPage)
         {
-            IEnumerable<Racket> result = _racketCrudService.GetTenRackets();
-            return (result != null && result.Any()) ? Ok(result) : NotFound();
+            //IEnumerable<Racket> result = _racketCrudService.GetTenRackets();
+            ResponseObject result = _racketCrudService.GetAllRackets(currentPage);
+            return (result != null) ? Ok(result) : NotFound();
         }
 
         // GET api/<RacketController>/5
@@ -72,6 +73,7 @@ namespace RacketScrapper.API.Controllers
         [HttpGet("search/{name}")]
         public IActionResult GetRacketByName(string name)
         {
+            Console.WriteLine("ENTROOOOOOOOOO");
             IEnumerable<Racket> result = _racketCrudService.GetRacketByName(name);
             return (result != null) ? Ok(result) : NotFound();
 
@@ -83,6 +85,22 @@ namespace RacketScrapper.API.Controllers
         {
             value.RacketId = id;
             return _racketCrudService.ModifyRacket(value) ? Ok() : StatusCode(500);
+        }
+
+        [HttpPost("sort/price-asc")]
+        public IActionResult OrderByPriceAsc([FromBody] IEnumerable<Racket> values)
+        {
+            IEnumerable<Racket> result = _racketCrudService.OrderByPriceAsc(values);
+            return (result != null) ? Ok(result) : BadRequest();
+
+        }
+
+        [HttpPost("sort/price-desc")]
+        public IActionResult OrderByPriceDesc([FromBody] IEnumerable<Racket> values)
+        {
+            IEnumerable<Racket> result = _racketCrudService.OrderByPriceDesc(values);
+            return (result != null) ? Ok(result) : BadRequest();
+
         }
 
     }

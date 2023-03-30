@@ -55,9 +55,27 @@ namespace RacketsScrapper.Infrastructure
             return _racketDbContext.SaveChanges() > 0;
         }
 
-        public IEnumerable<Racket> GetAllRackets()
+        public ResponseObject GetAllRackets(int currentPage)
         {
-            return _racketDbContext.Rackets.ToList();
+            if (_racketDbContext.Rackets is null || currentPage < 1)
+                return null;
+
+            float racketNumberByPage = 20f;
+            double pagesNumber = Math.Ceiling(_racketDbContext.Rackets.Count() / racketNumberByPage);
+            var result = _racketDbContext.Rackets
+                .Skip((currentPage - 1) * (int)racketNumberByPage) // numero di elementi da ignorare
+                .Take((int)racketNumberByPage) // elementi da prendere
+                .ToList();
+
+            ResponseObject response = new ResponseObject()
+            {
+                Rackets = result,
+                Pages = pagesNumber,
+                CurrentPage = currentPage,
+            };
+
+
+            return response;
         }
 
         public Racket? GetRacketById(int id)
@@ -106,10 +124,29 @@ namespace RacketsScrapper.Infrastructure
 
         public IEnumerable<Racket> GetRacketByName(string name)
         {
-            var result = (from racket in _racketDbContext.Rackets
-                          where racket.Marca.Contains(name)
-                          select racket).ToList();
+            IEnumerable<Racket>? result = null;
+            if (!string.IsNullOrEmpty(name)) 
+            {
+                result = (from racket in _racketDbContext.Rackets
+                          where racket.Marca.Contains(name) 
+                          ||    racket.Modello.Contains(name)
+                          select racket);
+            }
+
+                 
             return result;
+        }
+
+        public IEnumerable<Racket> OrderByPriceAsc(IEnumerable<Racket> values)
+        {
+            return values.OrderBy(racket => racket.Prezzo);
+        }
+
+        public IEnumerable<Racket> OrderByPriceDesc(IEnumerable<Racket> values)
+        {
+            return (from racket in values
+                   orderby racket.Prezzo descending
+                   select racket);
         }
     }
 }

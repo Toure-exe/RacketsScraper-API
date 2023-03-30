@@ -17,9 +17,11 @@ namespace RacketsScrapper.Application
 
         public Racket GetRacketById(int id);
 
-        public IEnumerable<Racket> GetAllRackets();
+        public ResponseObject GetAllRackets(int currentPage);
 
         public IEnumerable<Racket> GetTenRackets();
         IEnumerable<Racket> GetRacketByName(string name);
+        IEnumerable<Racket> OrderByPriceAsc(IEnumerable<Racket> values);
+        IEnumerable<Racket> OrderByPriceDesc(IEnumerable<Racket> values);
     }
 }

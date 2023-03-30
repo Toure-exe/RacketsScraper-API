@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RacketsScrapper.Infrastructure;
 
@@ -10,9 +11,11 @@ using RacketsScrapper.Infrastructure;
 namespace RacketsScrapper.Infrastructure.Migrations
 {
     [DbContext(typeof(RacketDbContext))]
-    partial class RacketDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230330091042_AddPrezzoScontato")]
+    partial class AddPrezzoScontato
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -74,6 +77,9 @@ namespace RacketsScrapper.Infrastructure.Migrations
                     b.Property<double>("Prezzo")
                         .HasColumnType("float");
 
+                    b.Property<double>("PrezzoScontato")
+                        .HasColumnType("float");
+
                     b.Property<int>("Profilo")
                         .HasColumnType("int");
 
@@ -94,9 +100,6 @@ namespace RacketsScrapper.Infrastructure.Migrations
 
                     b.Property<string>("Url")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("VecchioPrezzo")
-                        .HasColumnType("float");
 
                     b.HasKey("RacketId");
 
