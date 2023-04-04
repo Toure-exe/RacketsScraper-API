@@ -61,6 +61,26 @@ namespace RacketScrapper.API.Controllers
             return (result != null) ? Ok(result) : NotFound();
         }
 
+
+        [EnableCors("corsPolicy")]
+        [HttpGet("rackets/filter/{page}")]
+        public IActionResult GetFilteredRacket([FromQuery] RequestObject request, int page)
+        {
+            //IEnumerable<Racket> result = _racketCrudService.GetTenRackets();
+            ResponseObject result = _racketCrudService.GetAllRacketsWithFilter(request,page);
+            return (result != null) ? Ok(result) : NotFound();
+        }
+
+        /*[EnableCors("corsPolicy")]
+        [HttpGet("rackets/filter/{page}")]
+        public IActionResult GetFilteredRacketByPage(int page)
+        {
+            //IEnumerable<Racket> result = _racketCrudService.GetTenRackets();
+            ResponseObject result = _racketCrudService.GetAllRacketsWithFilter(null,page);
+            return (result != null) ? Ok(result) : NotFound();
+        }*/
+
+
         // GET api/<RacketController>/5
         [HttpGet("{id}")]
         public IActionResult GetRacketById(int id)
@@ -71,10 +91,9 @@ namespace RacketScrapper.API.Controllers
         }
 
         [HttpGet("search/{name}")]
-        public IActionResult GetRacketByName(string name)
+        public IActionResult GetRacketByName([FromQuery] int page,string name)
         {
-            Console.WriteLine("ENTROOOOOOOOOO");
-            IEnumerable<Racket> result = _racketCrudService.GetRacketByName(name);
+            IEnumerable<Racket> result = _racketCrudService.GetRacketByName(name,page);
             return (result != null) ? Ok(result) : NotFound();
 
         }

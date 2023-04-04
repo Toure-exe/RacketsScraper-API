@@ -10,9 +10,11 @@ namespace RacketsScrapper.Domain
     {
         // inserire un attributo per il numero tot di articoli trovati
         public IEnumerable<Racket> ? Rackets { get; set; }
-
+    
         public double Pages { get; set; }
 
         public int CurrentPage { get; set; }
+
+        public int Elements { get; set; }
     }
 }

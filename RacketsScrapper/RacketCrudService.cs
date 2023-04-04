@@ -47,9 +47,9 @@ namespace RacketsScrapper.Application
             return _racketsRepository.UpdateRacket(racket);
         }
 
-        public IEnumerable<Racket> GetRacketByName(string name)
+        public IEnumerable<Racket> GetRacketByName(string name, int page)
         {
-           return _racketsRepository.GetRacketByName(name);
+           return _racketsRepository.GetRacketByName(name,page);
         }
 
         public IEnumerable<Racket> OrderByPriceAsc(IEnumerable<Racket> values)
@@ -61,5 +61,15 @@ namespace RacketsScrapper.Application
         {
             return _racketsRepository.OrderByPriceDesc(values);
         }
+
+        public ResponseObject GetAllRacketsWithFilter(RequestObject request, int page)
+        {
+                return _racketsRepository.GetAllRacketsWithFilter(request, page); 
+        }
+
+        /*public ResponseObject GetRacketsByPage(int page)
+        {
+            return _racketsRepository.IndexPage(page);
+        }*/
     }
 }

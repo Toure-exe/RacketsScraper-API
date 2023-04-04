@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using RacketScrapper.API.Tasks;
 using RacketsScrapper.Application;
 using RacketsScrapper.Infrastructure;
 
@@ -16,10 +17,10 @@ builder.Services.AddCors(options =>
                                     .AllowAnyHeader()
                                     .AllowAnyMethod();
             });
-
 });
 
 
+builder.Services.AddHostedService<ServiceScheduler>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

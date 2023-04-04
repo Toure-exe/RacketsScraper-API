@@ -23,8 +23,12 @@ namespace RacketsScrapper.Infrastructure
 
         public ResponseObject GetAllRackets(int currentPage);
 
-        IEnumerable<Racket> GetRacketByName(string name);
+        IEnumerable<Racket> GetRacketByName(string name, int page);
         IEnumerable<Racket> OrderByPriceAsc(IEnumerable<Racket> values);
         IEnumerable<Racket> OrderByPriceDesc(IEnumerable<Racket> values);
+
+        public ResponseObject GetAllRacketsWithFilter(RequestObject request, int page);
+
+        public ResponseObject IndexPage(int page);
     }
 }

@@ -12,6 +12,7 @@ namespace RacketsScrapper.Infrastructure
     public class RacketDbContext : DbContext
     {
         public DbSet<Racket> Rackets { get; set; }
+        public DbSet<FilteredRacket> FilteredRackets { get; set; }
         /*
          *  se faccio Add-Migration o update-database con il costruttore mi esce un errore (console app)
          */
@@ -28,7 +29,17 @@ namespace RacketsScrapper.Infrastructure
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //optionsBuilder.UseSqlServer("Data Source = AK24730\\MSSQLSERVER01; Initial Catalog= db_racchette; Integrated Security=true; TrustServerCertificate=True");
+           
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            //base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<FilteredRacket>(rck =>
+            {
+                rck.HasNoKey();
+                rck.ToView("Filtered_racket");
+            });
         }
 
     }
