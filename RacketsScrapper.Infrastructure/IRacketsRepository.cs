@@ -21,14 +21,14 @@ namespace RacketsScrapper.Infrastructure
 
         public bool UpdateRacket(Racket racket);
 
-        public ResponseObject GetAllRackets(int currentPage);
+        public ResponseFilterObject GetAllRackets(int currentPage);
 
-        IEnumerable<Racket> GetRacketByName(string name, int page);
+        ResponseFilterObject ?GetRacketByName(string name, int page);
         IEnumerable<Racket> OrderByPriceAsc(IEnumerable<Racket> values);
         IEnumerable<Racket> OrderByPriceDesc(IEnumerable<Racket> values);
 
-        public ResponseObject GetAllRacketsWithFilter(RequestObject request, int page);
+        public ResponseFilterObject GetAllRacketsWithFilter(RequestFilterObject request, int page);
 
-        public ResponseObject IndexPage(int page);
+
     }
 }

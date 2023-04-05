@@ -17,15 +17,15 @@ namespace RacketsScrapper.Application
 
         public Racket GetRacketById(int id);
 
-        public ResponseObject GetAllRackets(int currentPage);
+        public ResponseFilterObject GetAllRackets(int currentPage);
 
         public IEnumerable<Racket> GetTenRackets();
-        IEnumerable<Racket> GetRacketByName(string name, int page);
-        IEnumerable<Racket> OrderByPriceAsc(IEnumerable<Racket> values);
-        IEnumerable<Racket> OrderByPriceDesc(IEnumerable<Racket> values);
+        public ResponseFilterObject GetRacketByName(string name, int page);
+        public IEnumerable<Racket> OrderByPriceAsc(IEnumerable<Racket> values);
+        public IEnumerable<Racket> OrderByPriceDesc(IEnumerable<Racket> values);
 
-        public ResponseObject GetAllRacketsWithFilter(RequestObject request, int page);
+        public ResponseFilterObject GetAllRacketsWithFilter(RequestFilterObject request, int page);
 
-       // public ResponseObject GetRacketsByPage(int page);
+       public bool InsertRacket(Racket racket);
     }
 }

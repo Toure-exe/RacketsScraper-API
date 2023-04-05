@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static System.Net.WebRequestMethods;
 
@@ -102,7 +103,8 @@ namespace RacketsScrapper.Application
                 if (detailNode is not null)
                     racket.VecchioPrezzo = double.Parse(detailNode.InnerText.Replace("&#8364;", string.Empty).Replace(",", "."));
                 racket.ImageLink = (doc.DocumentNode.SelectSingleNode("//*[@id=\"piGal\"]/ul[1]/li[1]/a/@href")).Attributes["href"].Value;
-                racket.Marca = doc.DocumentNode.SelectSingleNode("//*[@id=\"bodyContent\"]/form/div/div/div/div[1]/ol/li[2]/div/div[2]/div[3]/h1/span").InnerText;            
+                string tempMarca= doc.DocumentNode.SelectSingleNode("//*[@id=\"bodyContent\"]/form/div/div/div/div[1]/ol/li[2]/div/div[2]/div[3]/h1/span").InnerText;
+                racket.Marca = tempMarca.Split(" ")[0].ToLower();
                 var titles = doc.DocumentNode.SelectNodes("//*[@id=\"bodyContent\"]/form/div/div/div/div[1]/ol/li[1]/div[2]/div/div[2]/table/tbody/tr/td[1]/b");
                 var contents = doc.DocumentNode.SelectNodes("//*[@id=\"bodyContent\"]/form/div/div/div/div[1]/ol/li[1]/div[2]/div/div[2]/table/tbody/tr/td[2]/p");
                 if(titles != null)
@@ -118,7 +120,19 @@ namespace RacketsScrapper.Application
                                 racket.Telaio = contents.ElementAt(i).InnerText;
                                 break;
                             case "SESSO: ":
-                                racket.Sesso = contents.ElementAt(i).InnerText;
+                                string sexTemp = contents.ElementAt(i).InnerText.Trim();
+                                if (sexTemp == "MASCHILE")
+                                {
+                                    racket.Sesso = "Uomini";
+
+                                }else if(sexTemp == "FEMMINILE")
+                                {
+                                    racket.Sesso = "Donna";
+                                }
+                                else
+                                {
+                                    racket.Sesso = "Unisex";
+                                }
                                 break;
                             case "NUCLEO: ":
                                 racket.Nucleo = contents.ElementAt(i).InnerText;
@@ -133,7 +147,15 @@ namespace RacketsScrapper.Application
                                 racket.Eta = contents.ElementAt(i).InnerText;
                                 break;
                             case "COLORE: ":
-                                racket.ColoreUno = contents.ElementAt(i).InnerText;
+                                string tempColor = contents.ElementAt(i).InnerText;
+                                if (tempColor[0] == ' ')
+                                    tempColor = tempColor.Substring(1);
+                                string[] vColor = tempColor.Split(" ");
+                                if(vColor.Length > 1) 
+                                {
+                                    racket.ColoreDue = vColor[1].ToLower();
+                                }
+                                racket.ColoreUno = vColor[0].ToLower();
                                 break;
                             case "BILANCIAMENTO: ":
                                 racket.Bilanciamento = contents.ElementAt(i).InnerText;

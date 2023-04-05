@@ -57,17 +57,17 @@ namespace RacketScrapper.API.Controllers
         public IActionResult GetAllRackets(int currentPage)
         {
             //IEnumerable<Racket> result = _racketCrudService.GetTenRackets();
-            ResponseObject result = _racketCrudService.GetAllRackets(currentPage);
+            ResponseFilterObject result = _racketCrudService.GetAllRackets(currentPage);
             return (result != null) ? Ok(result) : NotFound();
         }
 
 
         [EnableCors("corsPolicy")]
         [HttpGet("rackets/filter/{page}")]
-        public IActionResult GetFilteredRacket([FromQuery] RequestObject request, int page)
+        public IActionResult GetFilteredRacket([FromQuery] RequestFilterObject request, int page)
         {
             //IEnumerable<Racket> result = _racketCrudService.GetTenRackets();
-            ResponseObject result = _racketCrudService.GetAllRacketsWithFilter(request,page);
+            ResponseFilterObject result = _racketCrudService.GetAllRacketsWithFilter(request,page);
             return (result != null) ? Ok(result) : NotFound();
         }
 
@@ -93,7 +93,7 @@ namespace RacketScrapper.API.Controllers
         [HttpGet("search/{name}")]
         public IActionResult GetRacketByName([FromQuery] int page,string name)
         {
-            IEnumerable<Racket> result = _racketCrudService.GetRacketByName(name,page);
+            ResponseFilterObject result = _racketCrudService.GetRacketByName(name,page);
             return (result != null) ? Ok(result) : NotFound();
 
         }
@@ -106,19 +106,11 @@ namespace RacketScrapper.API.Controllers
             return _racketCrudService.ModifyRacket(value) ? Ok() : StatusCode(500);
         }
 
-        [HttpPost("sort/price-asc")]
-        public IActionResult OrderByPriceAsc([FromBody] IEnumerable<Racket> values)
+        [HttpPost("rackets/insert")]
+        public IActionResult insertRacket([FromBody] Racket value)
         {
-            IEnumerable<Racket> result = _racketCrudService.OrderByPriceAsc(values);
-            return (result != null) ? Ok(result) : BadRequest();
-
-        }
-
-        [HttpPost("sort/price-desc")]
-        public IActionResult OrderByPriceDesc([FromBody] IEnumerable<Racket> values)
-        {
-            IEnumerable<Racket> result = _racketCrudService.OrderByPriceDesc(values);
-            return (result != null) ? Ok(result) : BadRequest();
+            bool result = _racketCrudService.InsertRacket(value);
+            return (result) ? Ok(result) : BadRequest();
 
         }
 

@@ -28,16 +28,16 @@ namespace RacketsScrapper.Application
 
         public bool DeleteRacketbyId(int id)
         {
-           Racket toDelete = _racketsRepository.GetRacketById(id);
-           return (toDelete != null) ?_racketsRepository.DeleteRacket(toDelete) : false;
+           Racket? toDelete = _racketsRepository.GetRacketById(id);
+           return (toDelete != null) && _racketsRepository.DeleteRacket(toDelete);
         }
 
-        public ResponseObject GetAllRackets(int currentPage)
+        public ResponseFilterObject GetAllRackets(int currentPage)
         {
             return _racketsRepository.GetAllRackets(currentPage);
         }
 
-        public Racket GetRacketById(int id)
+        public Racket? GetRacketById(int id)
         {
             return _racketsRepository.GetRacketById(id);
         }
@@ -47,7 +47,7 @@ namespace RacketsScrapper.Application
             return _racketsRepository.UpdateRacket(racket);
         }
 
-        public IEnumerable<Racket> GetRacketByName(string name, int page)
+        public ResponseFilterObject GetRacketByName(string name, int page)
         {
            return _racketsRepository.GetRacketByName(name,page);
         }
@@ -62,14 +62,14 @@ namespace RacketsScrapper.Application
             return _racketsRepository.OrderByPriceDesc(values);
         }
 
-        public ResponseObject GetAllRacketsWithFilter(RequestObject request, int page)
+        public ResponseFilterObject GetAllRacketsWithFilter(RequestFilterObject request, int page)
         {
                 return _racketsRepository.GetAllRacketsWithFilter(request, page); 
         }
 
-        /*public ResponseObject GetRacketsByPage(int page)
+        public bool InsertRacket(Racket racket)
         {
-            return _racketsRepository.IndexPage(page);
-        }*/
+            return _racketsRepository.InsertRacket(racket);
+        }
     }
 }

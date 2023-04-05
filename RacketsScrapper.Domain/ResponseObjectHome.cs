@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RacketsScrapper.Domain
 {
-    public class ResponseObjectHome : ResponseObject
+    public class ResponseObjectHome : ResponseFilterObject
     {
         public IEnumerable<string> Marche { get; set; }
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RacketsScrapper.Domain
 {
-    public class RequestObject
+    public class RequestFilterObject
     {
 
         public string Order { get; set; }

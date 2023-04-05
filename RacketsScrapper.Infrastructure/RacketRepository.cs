@@ -15,13 +15,12 @@ namespace RacketsScrapper.Infrastructure
     {
         public readonly RacketDbContext _racketDbContext;
         private readonly ICacheService _cacheService;
-        private List<Racket> filteredList;
+         
 
         public RacketRepository(RacketDbContext racketDbContext, ICacheService cacheService)
         {
             _racketDbContext = racketDbContext;
             _cacheService = cacheService;
-            //filteredList = new();
         }
 
         public bool DeleteAllRackets()
@@ -36,20 +35,7 @@ namespace RacketsScrapper.Infrastructure
 
         public IEnumerable<Racket> GetTenRackets()
         {
-            List<Racket> result = new List<Racket>();
-            int i = 0;
-            foreach (Racket racket in _racketDbContext.Rackets)
-            {
-                if (i >= 10)
-                    break;
-                else
-                {
-                    result.Add(racket);
-                    i++;
-                }
-            }
-
-            return result;
+            return _racketDbContext.Rackets.Take(10);
         }
 
         public bool DeleteRacket(Racket racket)
@@ -59,94 +45,93 @@ namespace RacketsScrapper.Infrastructure
             return _racketDbContext.SaveChanges() > 0;
         }
 
-        public ResponseObject GetAllRackets(int currentPage)
+        public ResponseFilterObject GetAllRackets(int currentPage)
         {
             if (_racketDbContext.Rackets is null || currentPage < 1)
                 return null;
 
+            var racketCtx = _racketDbContext.Rackets;
             float racketNumberByPage = 20f;
-            double pagesNumber = Math.Ceiling(_racketDbContext.Rackets.Count() / racketNumberByPage);
-            var result = _racketDbContext.Rackets
+            double pagesNumber = Math.Ceiling(racketCtx.Count() / racketNumberByPage);
+            var result = racketCtx
                 .Skip((currentPage - 1) * (int)racketNumberByPage) // numero di elementi da ignorare
                 .Take((int)racketNumberByPage) // elementi da prendere
                 .ToList();
 
-            ResponseObject response = new ResponseObjectHome()
+            ResponseFilterObject response = new ResponseObjectHome()
             {
                 Rackets = result,
                 Pages = pagesNumber,
                 CurrentPage = currentPage,
-                Sessi = (from rck in _racketDbContext.Rackets
+                Sessi = (from rck in racketCtx
+                         where rck.Sesso != null
                         select rck.Sesso).Distinct(),
-                Marche = (from rck in _racketDbContext.Rackets
+                Marche = (from rck in racketCtx
+                          where rck.Marca != null
                          select rck.Marca).Distinct(),
-                Colori = (from rck in _racketDbContext.Rackets
-                         select rck.ColoreUno).Distinct(),
-                Elements = _racketDbContext.Rackets.Count()
+                Colori = ((from rck in racketCtx
+                          where rck.ColoreUno != null
+                         select rck.ColoreUno).Concat(from rck in racketCtx
+                                                      where rck.ColoreDue != null
+                                                      select rck.ColoreDue)).Distinct(),
+                Elements = racketCtx.Count()
             };
 
 
             return response;
         }
 
-        public ResponseObject GetAllRacketsWithFilter(RequestObject request, int page)
+        public ResponseFilterObject GetAllRacketsWithFilter(RequestFilterObject request, int page)
         {
-            this.filteredList = new();
+            List<Racket> filteredList = new List<Racket>();
             if (_racketDbContext.Rackets is null)
                 return null;
 
+            var racketQuerybleList = _racketDbContext.Rackets.AsQueryable();
             float racketNumberByPage = 20f;
-            
-            if(request.Colors is not null)
+
+            if (request.Colors is not null)
             {
-                foreach(var color in request.Colors)
+                foreach (var color in request.Colors)
                 {
-                    this.filteredList.AddRange(_racketDbContext.Rackets.Where(racket => racket.ColoreUno.Contains(color)
+                    filteredList.AddRange(racketQuerybleList.Where(racket => racket.ColoreUno.Contains(color)
                    || racket.ColoreDue.Contains(color)));
                 }
             }
             if (request.SexList is not null)
             {
-                foreach(var sex in request.SexList)
+                foreach (var sex in request.SexList)
                 {
-                    this.filteredList.AddRange( _racketDbContext.Rackets.Where(racket => racket.Sesso == sex));
+                    filteredList.AddRange(racketQuerybleList.Where(racket => racket.Sesso == sex));
                 }
 
             }
-            if(request.Brands is not null)
+            if (request.Brands is not null)
             {
-                foreach(var brand in request.Brands)
+                foreach (var brand in request.Brands)
                 {
-                    this.filteredList.AddRange(_racketDbContext.Rackets.Where(racket => racket.Marca.Contains(brand)));
+                    filteredList.AddRange(racketQuerybleList.Where(racket => racket.Marca.Contains(brand)));
                 }
             }
-            if(request.Order == "asc")
+            if (request.Order == "asc")
             {
-                this.filteredList = this.filteredList.OrderBy(item => item.Prezzo).ToList();
+                filteredList = filteredList.OrderBy(item => item.Prezzo).ToList();
             }
-            else if(request.Order == "desc")
+            else if (request.Order == "desc")
             {
-                this.filteredList = this.filteredList.OrderByDescending(item => item.Prezzo).ToList();
+                filteredList = filteredList.OrderByDescending(item => item.Prezzo).ToList();
             }
-            
 
-           var responseList = this.filteredList.Skip((page - 1) * (int)racketNumberByPage) 
-            .Take((int)racketNumberByPage) 
-            .ToList();
-            double pagesNumber = Math.Ceiling(this.filteredList.Count() / racketNumberByPage);
 
-            ResponseObject response = new ResponseObject()
-            {
-                Rackets = responseList,
-                Pages = pagesNumber,
-                CurrentPage = page,
-                Elements = filteredList.Count()
-            };
+            var responseList = filteredList.Skip((page - 1) * (int)racketNumberByPage)
+             .Take((int)racketNumberByPage);
+            double pagesNumber = Math.Ceiling(filteredList.Count / racketNumberByPage);
 
+            ResponseFilterObject response = InstantiateResponseFilter(page, filteredList, responseList, pagesNumber);
 
             return response;
         }
-
+     
         public Racket? GetRacketById(int id)
         {
             Racket cacheData = _cacheService.GetData<Racket>($"{id}");
@@ -155,7 +140,7 @@ namespace RacketsScrapper.Infrastructure
                 return cacheData;
             }
 
-            Racket racket = _racketDbContext.Rackets.Find(id);
+            Racket ?racket = _racketDbContext.Rackets.Find(id);
             if (racket is not null)
                 _cacheService.SetData($"{racket.RacketId}", racket, DateTimeOffset.Now.AddDays(1));
             return racket;
@@ -191,9 +176,10 @@ namespace RacketsScrapper.Infrastructure
             return modified;
         }
 
-        public IEnumerable<Racket> GetRacketByName(string name, int page)
+        public ResponseFilterObject? GetRacketByName(string name, int page)
         {
             IEnumerable<Racket>? result = null;
+            ResponseFilterObject? response = null;
             double racketNumberByPage = 20f;
             if (!string.IsNullOrEmpty(name)) 
             {
@@ -202,13 +188,37 @@ namespace RacketsScrapper.Infrastructure
                           ||    racket.Modello.Contains(name)
                           select racket);
 
-                return result.Skip((page - 1) * (int)racketNumberByPage)
+                IEnumerable<Racket>? filteredResult = result.Skip((page - 1) * (int)racketNumberByPage)
                     .Take((int) racketNumberByPage)
                     .ToList();
+            
+                double pagesNumber = Math.Ceiling(result.Count() / racketNumberByPage);
+                response = new ResponseObjectHome()
+                {
+                    Rackets = filteredResult,
+                    Pages = pagesNumber,
+                    CurrentPage = page,
+                    Sessi = (from rck in result
+                             where !string.IsNullOrEmpty(rck.Sesso)
+                                    && !string.IsNullOrWhiteSpace(rck.Sesso)
+                             select rck.Sesso).Distinct(),
+                    Marche = (from rck in result
+                              where !string.IsNullOrEmpty(rck.Marca)
+                                    && !string.IsNullOrWhiteSpace(rck.Marca)
+                              select rck.Marca.ToLower()).Distinct(),
+                    Colori = ((from rck in result
+                              where !string.IsNullOrEmpty(rck.ColoreUno) &&
+                                    !string.IsNullOrWhiteSpace(rck.ColoreUno)
+                              select rck.ColoreUno).Concat(from rck in result
+                                                           where !string.IsNullOrEmpty(rck.ColoreDue) &&
+                                                                 !string.IsNullOrWhiteSpace(rck.ColoreDue)
+                                                           select rck.ColoreDue)).Distinct(),
+                    Elements = result.Count()
+                };
+
             }
 
-                 
-            return result;
+            return response;
         }
 
         public IEnumerable<Racket> OrderByPriceAsc(IEnumerable<Racket> values)
@@ -223,22 +233,31 @@ namespace RacketsScrapper.Infrastructure
                    select racket);
         }
 
-        public ResponseObject IndexPage(int page)
+        private ResponseFilterObject InstantiateResponseFilter(int page, List<Racket> filteredList, IEnumerable<Racket> responseList, double pagesNumber)
         {
-            double racketNumberByPage = 20f;
-            var responseList = this.filteredList.Skip((page - 1) * (int)racketNumberByPage)
-            .Take((int)racketNumberByPage)
-            .ToList();
-            double pagesNumber = Math.Ceiling(this.filteredList.Count() / racketNumberByPage);
-
-            ResponseObject response = new ResponseObject()
+            return new ResponseObjectHome()
             {
                 Rackets = responseList,
                 Pages = pagesNumber,
                 CurrentPage = page,
+                Elements = filteredList.Count,
+                Sessi = (from rck in filteredList
+                         where !string.IsNullOrEmpty(rck.Sesso)
+                                && !string.IsNullOrWhiteSpace(rck.Sesso)
+                         select rck.Sesso).Distinct(),
+                Marche = (from rck in filteredList
+                          where !string.IsNullOrEmpty(rck.Marca)
+                                && !string.IsNullOrWhiteSpace(rck.Marca)
+                          select rck.Marca.ToLower()).Distinct(),
+                Colori = ((from rck in filteredList
+                           where !string.IsNullOrEmpty(rck.ColoreUno) &&
+                                 !string.IsNullOrWhiteSpace(rck.ColoreUno)
+                           select rck.ColoreUno).Concat(from rck in filteredList
+                                                        where !string.IsNullOrEmpty(rck.ColoreDue) &&
+                                                              !string.IsNullOrWhiteSpace(rck.ColoreDue)
+                                                        select rck.ColoreDue)).Distinct(),
             };
-
-            return response;
         }
+
     }
 }

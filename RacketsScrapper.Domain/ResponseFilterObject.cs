@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace RacketsScrapper.Domain
 {
-    public class ResponseObject
+    public class ResponseFilterObject
     {
-        // inserire un attributo per il numero tot di articoli trovati
         public IEnumerable<Racket> ? Rackets { get; set; }
     
         public double Pages { get; set; }
