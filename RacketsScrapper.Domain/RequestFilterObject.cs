@@ -8,7 +8,7 @@ namespace RacketsScrapper.Domain
 {
     public class RequestFilterObject
     {
-
+        public string? Keyword { get; set; }
         public string Order { get; set; }
 
         public List<string> Colors { get; set; }

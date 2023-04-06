@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using RacketsScrapper.Domain;
 using System;
 using System.Collections.Generic;
@@ -90,19 +91,31 @@ namespace RacketsScrapper.Infrastructure
             var racketQuerybleList = _racketDbContext.Rackets.AsQueryable();
             float racketNumberByPage = 20f;
 
+          /*  if(request.Keyword is not null)
+            {
+                if (!string.IsNullOrEmpty(request.Keyword))
+                {
+                    filteredList.AddRange((from racket in racketQuerybleList
+                                           where racket.Marca.Contains(request.Keyword)
+                                           || racket.Modello.Contains(request.Keyword)
+                                           select racket));
+                }
+            }*/
+
             if (request.Colors is not null)
             {
                 foreach (var color in request.Colors)
                 {
                     filteredList.AddRange(racketQuerybleList.Where(racket => racket.ColoreUno.Contains(color)
-                   || racket.ColoreDue.Contains(color)));
+                   || racket.ColoreDue.Contains(color) && !filteredList.Contains(racket)));
                 }
             }
             if (request.SexList is not null)
             {
                 foreach (var sex in request.SexList)
                 {
-                    filteredList.AddRange(racketQuerybleList.Where(racket => racket.Sesso == sex));
+                    filteredList.AddRange(racketQuerybleList.Where(racket => racket.Sesso == sex 
+                                          && !filteredList.Contains(racket)));
                 }
 
             }
@@ -110,18 +123,37 @@ namespace RacketsScrapper.Infrastructure
             {
                 foreach (var brand in request.Brands)
                 {
-                    filteredList.AddRange(racketQuerybleList.Where(racket => racket.Marca.Contains(brand)));
+                    filteredList.AddRange(racketQuerybleList.Where(racket => racket.Marca.Contains(brand)
+                                                        && !filteredList.Contains(racket)));
                 }
             }
             if (request.Order == "asc")
             {
-                filteredList = filteredList.OrderBy(item => item.Prezzo).ToList();
+                if(!filteredList.IsNullOrEmpty())
+                    filteredList = filteredList.OrderBy(item => item.Prezzo).ToList();
+                else
+                    filteredList = racketQuerybleList.OrderBy(item => item.Prezzo).ToList();
             }
             else if (request.Order == "desc")
             {
-                filteredList = filteredList.OrderByDescending(item => item.Prezzo).ToList();
+                if (!filteredList.IsNullOrEmpty())
+                    filteredList = filteredList.OrderByDescending(item => item.Prezzo).ToList();
+                else
+                    filteredList = racketQuerybleList.OrderByDescending(item => item.Prezzo).ToList();
+            }
+            else
+            {
+                if (filteredList.IsNullOrEmpty())
+                    filteredList = racketQuerybleList.ToList();
             }
 
+            if (request.Keyword is not null)
+            {
+                filteredList = (from racket in filteredList
+                                where racket.Marca.Contains(request.Keyword)
+                               // || racket.Modello.Contains(request.Keyword)
+                                select racket).ToList();
+            }
 
             var responseList = filteredList.Skip((page - 1) * (int)racketNumberByPage)
              .Take((int)racketNumberByPage);

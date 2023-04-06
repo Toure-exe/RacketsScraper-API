@@ -63,8 +63,8 @@ namespace RacketScrapper.API.Controllers
 
 
         [EnableCors("corsPolicy")]
-        [HttpGet("rackets/filter/{page}")]
-        public IActionResult GetFilteredRacket([FromQuery] RequestFilterObject request, int page)
+        [HttpPost("rackets/filter/{page}")]
+        public IActionResult GetFilteredRacket([FromBody] RequestFilterObject request, int page)
         {
             //IEnumerable<Racket> result = _racketCrudService.GetTenRackets();
             ResponseFilterObject result = _racketCrudService.GetAllRacketsWithFilter(request,page);
