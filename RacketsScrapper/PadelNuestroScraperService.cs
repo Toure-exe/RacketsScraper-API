@@ -4,6 +4,7 @@ using RacketsScrapper.Domain;
 using RacketsScrapper.Infrastructure;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -98,10 +99,10 @@ namespace RacketsScrapper.Application
                 string detailPage = _downloaderService.DownloadHtmlAsync(url).Result;
                 HtmlDocument doc = new HtmlDocument();
                 doc.LoadHtml(detailPage);
-                racket.Prezzo = double.Parse((doc.DocumentNode.SelectSingleNode("//*[@id=\"precio_articulo\"]/@content")).Attributes["content"].Value);
+                racket.Prezzo = double.Parse((doc.DocumentNode.SelectSingleNode("//*[@id=\"precio_articulo\"]/@content")).Attributes["content"].Value, CultureInfo.InvariantCulture);
                 var detailNode = doc.DocumentNode.SelectSingleNode("//*[@id=\"bodyContent\"]/form/div/div/div/div[1]/ol/li[2]/div/div[2]/div[3]/div/p/span/del");
                 if (detailNode is not null)
-                    racket.VecchioPrezzo = double.Parse(detailNode.InnerText.Replace("&#8364;", string.Empty).Replace(",", "."));
+                    racket.VecchioPrezzo = double.Parse(detailNode.InnerText.Replace("&#8364;", string.Empty).Replace(",", "."), CultureInfo.InvariantCulture);
                 racket.ImageLink = (doc.DocumentNode.SelectSingleNode("//*[@id=\"piGal\"]/ul[1]/li[1]/a/@href")).Attributes["href"].Value;
                 string tempMarca= doc.DocumentNode.SelectSingleNode("//*[@id=\"bodyContent\"]/form/div/div/div/div[1]/ol/li[2]/div/div[2]/div[3]/h1/span").InnerText;
                 racket.Marca = tempMarca.Split(" ")[0].ToLower();

@@ -12,7 +12,7 @@ namespace RacketsScrapper.Infrastructure
     public class RacketDbContext : DbContext
     {
         public DbSet<Racket> Rackets { get; set; }
-        public DbSet<FilteredRacket> FilteredRackets { get; set; }
+       // public DbSet<FilteredRacket> FilteredRackets { get; set; }
         /*
          *  se faccio Add-Migration o update-database con il costruttore mi esce un errore (console app)
          */
@@ -32,15 +32,15 @@ namespace RacketsScrapper.Infrastructure
            
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        /*protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<FilteredRacket>(rck =>
+           /* modelBuilder.Entity<FilteredRacket>(rck =>
             {
                 rck.HasNoKey();
                 rck.ToView("Filtered_racket");
             });
-        }
+        }*/
 
     }
 }
