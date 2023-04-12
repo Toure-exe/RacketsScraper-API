@@ -88,6 +88,7 @@ namespace RacketsScrapper.Infrastructure
             if (_racketDbContext.Rackets is null)
                 return null;
 
+            // concatenare racketQuerybleList scrivendo le query invece di usare una lista di supporto
             var racketQuerybleList = _racketDbContext.Rackets.AsQueryable();
             float racketNumberByPage = 20f;
 

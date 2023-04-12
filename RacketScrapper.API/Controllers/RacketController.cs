@@ -25,14 +25,12 @@ namespace RacketScrapper.API.Controllers
         [HttpPost("tennis-point/scrap")]
         public void GetDataFromTennisPoint()
         {
-            // _racketCrudService.DeleteAllRackets();
             _serviceDispatcher.RunTennisPointScraper();
         }
 
         [HttpPost("padel-nuestro/scrap")]
         public void GetDataFromPadelNuestro()
         {
-            // _racketCrudService.DeleteAllRackets();
             _serviceDispatcher.RunPadelNuestroScraper();
         }
 
@@ -56,7 +54,6 @@ namespace RacketScrapper.API.Controllers
         [HttpGet("rackets/{currentPage}")]
         public IActionResult GetAllRackets(int currentPage)
         {
-            //IEnumerable<Racket> result = _racketCrudService.GetTenRackets();
             ResponseFilterObject result = _racketCrudService.GetAllRackets(currentPage);
             return (result != null) ? Ok(result) : NotFound();
         }
@@ -66,19 +63,9 @@ namespace RacketScrapper.API.Controllers
         [HttpPost("rackets/filter/{page}")]
         public IActionResult GetFilteredRacket([FromBody] RequestFilterObject request, int page)
         {
-            //IEnumerable<Racket> result = _racketCrudService.GetTenRackets();
             ResponseFilterObject result = _racketCrudService.GetAllRacketsWithFilter(request,page);
             return (result != null) ? Ok(result) : NotFound();
         }
-
-        /*[EnableCors("corsPolicy")]
-        [HttpGet("rackets/filter/{page}")]
-        public IActionResult GetFilteredRacketByPage(int page)
-        {
-            //IEnumerable<Racket> result = _racketCrudService.GetTenRackets();
-            ResponseObject result = _racketCrudService.GetAllRacketsWithFilter(null,page);
-            return (result != null) ? Ok(result) : NotFound();
-        }*/
 
 
         // GET api/<RacketController>/5
