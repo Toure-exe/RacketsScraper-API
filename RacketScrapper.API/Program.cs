@@ -1,13 +1,21 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using RacketScrapper.API;
+using RacketScrapper.API.Services;
 using RacketScrapper.API.Tasks;
 using RacketsScrapper.Application;
+using RacketsScrapper.Domain.Identity;
 using RacketsScrapper.Infrastructure;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+/* ENABLE CORS POLICIES */
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("corsPolicy",
@@ -19,13 +27,47 @@ builder.Services.AddCors(options =>
             });
 });
 
+builder.Services.AddDbContext<RacketDbContext>(opt 
+    => opt.UseSqlServer(builder.Configuration.GetConnectionString("value")));
 
+/**IDENTITY CONFIG* */
+builder.Services.AddAuthentication();
+var identityBuilder = builder.Services.AddIdentityCore<User>(opt => opt.User.RequireUniqueEmail = true);
+identityBuilder = new IdentityBuilder(identityBuilder.UserType, typeof(IdentityRole), builder.Services);
+identityBuilder.AddEntityFrameworkStores<RacketDbContext>().AddDefaultTokenProviders();
+
+/** SCRAPER BACKGROUND TASK CONFIG */
 builder.Services.AddHostedService<ServiceScheduler>();
+
+/**DEFAULT CONFIG **/
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<RacketDbContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("value")));
+
+/** ENABLE JWT **/
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var key = Environment.GetEnvironmentVariable("RACKET_KEY");
+builder.Services.AddAuthentication(auth =>
+{
+    auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(jwt =>
+{
+    jwt.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateLifetime = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.GetSection("Issuer").Value,
+        ValidAudience = jwtSettings.GetSection("Audience").Value,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+    };
+});
+
+/**DEPENDENCY INJECTIONS* */
+builder.Services.AddAutoMapper(typeof(AutoMapping).Assembly);
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRacketsRepository, RacketRepository>();
 builder.Services.AddScoped<IRacketScraperService, TennisPointScraperService>();
 builder.Services.AddScoped<IRacketScraperService, PadelNuestroScraperService>();
@@ -33,6 +75,40 @@ builder.Services.AddScoped<IRacketCrudService, RacketCrudService>();
 builder.Services.AddScoped<IServiceDispatcher,  ServiceDispatcher>();
 builder.Services.AddScoped<IDownloaderService, DownloaderService>();
 builder.Services.AddScoped<ICacheService, CacheService>();
+
+/** OPEN API (SWAGGER) DOCUMENTATION FOR JWT BEARER **/
+builder.Services.AddSwaggerGen(opt =>
+{
+    opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "Enter 'Bearer' [space] YOUR_ACTUAL_TOKEN. " +
+        "Example: 'Bearer dfbvdkngfkgedgn",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    opt.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    {
+        { 
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "0Auth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header
+            },
+            new List<string>()
+        }
+
+    });
+});
+
 
 
 var app = builder.Build();
@@ -48,6 +124,7 @@ app.UseHttpsRedirection();
 
 app.UseCors("corsPolicy");
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

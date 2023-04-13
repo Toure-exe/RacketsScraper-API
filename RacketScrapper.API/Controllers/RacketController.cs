@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using RacketsScrapper.Application;
 using RacketsScrapper.Domain;
@@ -69,6 +70,7 @@ namespace RacketScrapper.API.Controllers
 
 
         // GET api/<RacketController>/5
+        [Authorize]
         [HttpGet("{id}")]
         public IActionResult GetRacketById(int id)
         {
@@ -77,6 +79,7 @@ namespace RacketScrapper.API.Controllers
             
         }
 
+        [Authorize]
         [HttpGet("search/{name}")]
         public IActionResult GetRacketByName([FromQuery] int page,string name)
         {

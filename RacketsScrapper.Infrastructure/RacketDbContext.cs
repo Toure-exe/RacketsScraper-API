@@ -6,10 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using RacketsScrapper.Domain.Identity;
 
 namespace RacketsScrapper.Infrastructure
 {
-    public class RacketDbContext : DbContext
+    public class RacketDbContext : IdentityDbContext<User>
     {
         public DbSet<Racket> Rackets { get; set; }
        // public DbSet<FilteredRacket> FilteredRackets { get; set; }
@@ -32,15 +34,11 @@ namespace RacketsScrapper.Infrastructure
            
         }
 
-        /*protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //base.OnModelCreating(modelBuilder);
-           /* modelBuilder.Entity<FilteredRacket>(rck =>
-            {
-                rck.HasNoKey();
-                rck.ToView("Filtered_racket");
-            });
-        }*/
+           base.OnModelCreating(modelBuilder);
+           modelBuilder.ApplyConfiguration(new RolesConfig());
+        }
 
     }
 }

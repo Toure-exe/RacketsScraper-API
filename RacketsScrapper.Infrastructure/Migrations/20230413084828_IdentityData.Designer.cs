@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RacketsScrapper.Infrastructure;
 
@@ -11,9 +12,11 @@ using RacketsScrapper.Infrastructure;
 namespace RacketsScrapper.Infrastructure.Migrations
 {
     [DbContext(typeof(RacketDbContext))]
-    partial class RacketDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230413084828_IdentityData")]
+    partial class IdentityData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,29 +50,6 @@ namespace RacketsScrapper.Infrastructure.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "96e74937-be5d-4dda-af95-605b2569e889",
-                            ConcurrencyStamp = "1cb529cc-2226-4511-9a8d-65ca18cf39e7",
-                            Name = "Utente Normale",
-                            NormalizedName = "UTENTE NORMALE"
-                        },
-                        new
-                        {
-                            Id = "1f640d84-db2b-4590-949d-2cae60fb5630",
-                            ConcurrencyStamp = "b4c3886c-7007-4440-9e4d-6ff5816ec27d",
-                            Name = "Amministratore",
-                            NormalizedName = "AMMINISTRATORE"
-                        },
-                        new
-                        {
-                            Id = "0800a606-3642-4b19-a6ff-17da8b28eae8",
-                            ConcurrencyStamp = "2e9a1f96-a99e-4671-9fa4-6ea6792d2255",
-                            Name = "Utente con privileggi",
-                            NormalizedName = "UTENTE CON PRIVILEGGI"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
