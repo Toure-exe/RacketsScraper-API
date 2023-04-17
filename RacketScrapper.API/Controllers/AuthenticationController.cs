@@ -13,13 +13,15 @@ namespace RacketScrapper.API.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IMapper _mapper;
         private readonly IAuthService _authService;
-        public AuthenticationController(UserManager<User> userManager, IMapper mapper, IAuthService authService)
+        public AuthenticationController(UserManager<User> userManager, IMapper mapper, IAuthService authService, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _mapper = mapper;
             _authService = authService;
+            _roleManager = roleManager;
         }
 
         [HttpPost("register")]
@@ -35,6 +37,10 @@ namespace RacketScrapper.API.Controllers
                 {
                     User user = _mapper.Map<User>(userDto);
                     user.Email = userDto.EmailAddress;
+                    if(!await _roleManager.RoleExistsAsync(userDto.Role))
+                    {
+                        return BadRequest("Il ruolo non esiste");
+                    }
                     var status = await _userManager.CreateAsync(user, userDto.Password);
                     if(!status.Succeeded)
                     {
@@ -44,6 +50,9 @@ namespace RacketScrapper.API.Controllers
                         }
                         return BadRequest(ModelState);
                     }
+
+                    await _userManager.AddToRoleAsync(user, userDto.Role);
+
                     return Ok();
 
                 }catch(Exception ex)

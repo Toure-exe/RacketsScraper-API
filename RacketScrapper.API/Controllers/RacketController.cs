@@ -36,13 +36,16 @@ namespace RacketScrapper.API.Controllers
         }
 
         // DELETE api/<RacketController>/5
+        [Authorize]
         [HttpDelete("{id}")]
         public IActionResult DeleteRacketById(int id)
         {
+            
             return _racketCrudService.DeleteRacketbyId(id) ? Ok() : StatusCode(500);
         }
 
         // DELETE api/<RacketController>/5
+        [Authorize]
         [HttpDelete]
         public IActionResult DeleteAllRacket()
         {
@@ -51,6 +54,7 @@ namespace RacketScrapper.API.Controllers
 
 
         // GET: api/<RacketController>
+        [Authorize]
         [EnableCors("corsPolicy")]
         [HttpGet("rackets/{currentPage}")]
         public IActionResult GetAllRackets(int currentPage)
@@ -59,7 +63,7 @@ namespace RacketScrapper.API.Controllers
             return (result != null) ? Ok(result) : NotFound();
         }
 
-
+        [Authorize]
         [EnableCors("corsPolicy")]
         [HttpPost("rackets/filter/{page}")]
         public IActionResult GetFilteredRacket([FromBody] RequestFilterObject request, int page)
@@ -74,6 +78,7 @@ namespace RacketScrapper.API.Controllers
         [HttpGet("{id}")]
         public IActionResult GetRacketById(int id)
         {
+            Console.WriteLine("->> " + this.User.Identity.Name);
             Racket result = _racketCrudService.GetRacketById(id);
             return (result != null) ? Ok(result) : NotFound();
             
@@ -89,6 +94,7 @@ namespace RacketScrapper.API.Controllers
         }
 
         // PUT api/<RacketController>/5
+        [Authorize]
         [HttpPut("{id}")]
         public IActionResult ModifyRacket(int id, [FromBody] Racket value)
         {
@@ -96,6 +102,7 @@ namespace RacketScrapper.API.Controllers
             return _racketCrudService.ModifyRacket(value) ? Ok() : StatusCode(500);
         }
 
+        [Authorize]
         [HttpPost("rackets/insert")]
         public IActionResult insertRacket([FromBody] Racket value)
         {

@@ -17,18 +17,18 @@ namespace RacketsScrapper.Infrastructure
             
                 new IdentityRole
                 {
-                    Name = "Utente Normale",
-                    NormalizedName = "UTENTE NORMALE"
+                    Name = "User",
+                    NormalizedName = "USER"
                 },
                 new IdentityRole
                 {
-                    Name = "Amministratore",
-                    NormalizedName = "AMMINISTRATORE"
+                    Name = "Admin",
+                    NormalizedName = "ADMIN"
                 }, 
                 new IdentityRole
                 {
-                    Name = "Utente con privileggi",
-                    NormalizedName = "UTENTE CON PRIVILEGGI"
+                    Name = "Super_User",
+                    NormalizedName = "SUPER_USER"
                 }
 
             );

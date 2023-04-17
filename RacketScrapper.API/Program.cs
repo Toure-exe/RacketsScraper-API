@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -45,8 +46,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 /** ENABLE JWT **/
+builder.Services.AddIdentity<User, IdentityRole>();
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-var key = Environment.GetEnvironmentVariable("RACKET_KEY");
+string key = Environment.GetEnvironmentVariable("RACKET_KEY");
 builder.Services.AddAuthentication(auth =>
 {
     auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -64,6 +66,36 @@ builder.Services.AddAuthentication(auth =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
     };
 });
+
+
+
+/*builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("JWT", policy =>
+    {
+        policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
+        policy.RequireAuthenticatedUser();
+    });
+
+    options.AddPolicy("SSO_GOOGLE", policy =>
+    {
+        policy.AuthenticationSchemes.Add(GoogleDefaults.AuthenticationScheme);
+        policy.RequireAuthenticatedUser();
+    });
+});*/
+
+
+/** ENABLE SSO **/
+
+/*builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = GoogleDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+}).AddGoogle(options =>
+{
+    options.ClientId = "600543089869-plavm2lirv6k30ti8mf76rgeicu28tr2.apps.googleusercontent.com";
+    options.ClientSecret = "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";
+});*/
 
 /**DEPENDENCY INJECTIONS* */
 builder.Services.AddAutoMapper(typeof(AutoMapping).Assembly);

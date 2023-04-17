@@ -15,7 +15,7 @@ namespace RacketsScrapper.Domain
 
         public string FirstName { get; set; }
 
-        public IEnumerable<string> Roles { get; set; }
+        public string Role { get; set; }
     }
 
     public class LoginDTO
