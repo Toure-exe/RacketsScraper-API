@@ -104,8 +104,9 @@ namespace RacketsScrapper.Application
                 if (detailNode is not null)
                     racket.VecchioPrezzo = double.Parse(detailNode.InnerText.Replace("&#8364;", string.Empty).Replace(",", "."), CultureInfo.InvariantCulture);
                 racket.ImageLink = (doc.DocumentNode.SelectSingleNode("//*[@id=\"piGal\"]/ul[1]/li[1]/a/@href")).Attributes["href"].Value;
-                string tempMarca= doc.DocumentNode.SelectSingleNode("//*[@id=\"bodyContent\"]/form/div/div/div/div[1]/ol/li[2]/div/div[2]/div[3]/h1/span").InnerText;
-                racket.Marca = tempMarca.Split(" ")[0].ToLower();
+                string modello= doc.DocumentNode.SelectSingleNode("//*[@id=\"bodyContent\"]/form/div/div/div/div[1]/ol/li[2]/div/div[2]/div[3]/h1/span").InnerText;
+                racket.Modello = modello;
+                racket.Marca = doc.DocumentNode.SelectSingleNode("//*[@id=\"bodyContent\"]/div[1]/a[4]").InnerText;
                 var titles = doc.DocumentNode.SelectNodes("//*[@id=\"bodyContent\"]/form/div/div/div/div[1]/ol/li[1]/div[2]/div/div[2]/table/tbody/tr/td[1]/b");
                 var contents = doc.DocumentNode.SelectNodes("//*[@id=\"bodyContent\"]/form/div/div/div/div[1]/ol/li[1]/div[2]/div/div[2]/table/tbody/tr/td[2]/p");
                 if(titles != null)
