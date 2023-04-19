@@ -36,6 +36,7 @@ namespace RacketScrapper.API.Controllers
             {
                 try
                 {
+                    string errorMsg = "";
                     User user = _mapper.Map<User>(userDto);
                     user.Email = userDto.EmailAddress;
                     if(!await _roleManager.RoleExistsAsync(userDto.Role))
@@ -47,9 +48,9 @@ namespace RacketScrapper.API.Controllers
                     {
                         foreach(var error in  status.Errors)
                         {
-                            ModelState.AddModelError(error.Code, error.Description);
+                            errorMsg = " " + error.Description+"\n";
                         }
-                        return BadRequest(ModelState);
+                        return BadRequest(errorMsg);
                     }
 
                     await _userManager.AddToRoleAsync(user, userDto.Role);

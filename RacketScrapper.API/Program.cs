@@ -48,7 +48,7 @@ builder.Services.AddSwaggerGen();
 /** ENABLE JWT **/
 builder.Services.AddIdentity<User, IdentityRole>();
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-string key = Environment.GetEnvironmentVariable("RACKET_KEY");
+string? key = Environment.GetEnvironmentVariable("RACKET_KEY");
 builder.Services.AddAuthentication(auth =>
 {
     auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
