@@ -16,7 +16,8 @@ namespace RacketScrapper.API.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IMapper _mapper;
         private readonly IAuthService _authService;
-        public AuthenticationController(UserManager<User> userManager, IMapper mapper, IAuthService authService, RoleManager<IdentityRole> roleManager)
+        public AuthenticationController(UserManager<User> userManager, IMapper mapper, IAuthService authService, 
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _mapper = mapper;

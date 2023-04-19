@@ -19,13 +19,13 @@ var builder = WebApplication.CreateBuilder(args);
 /* ENABLE CORS POLICIES */
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("corsPolicy",
-            policy =>
-            {
-                policy.WithOrigins("http://localhost:4200")
-                                    .AllowAnyHeader()
-                                    .AllowAnyMethod();
-            });
+options.AddPolicy("corsPolicy",
+    policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+    });
 });
 
 builder.Services.AddDbContext<RacketDbContext>(opt 
@@ -69,7 +69,7 @@ builder.Services.AddAuthentication(auth =>
 
 
 
-/*builder.Services.AddAuthorization(options =>
+builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("JWT", policy =>
     {
@@ -82,12 +82,12 @@ builder.Services.AddAuthentication(auth =>
         policy.AuthenticationSchemes.Add(GoogleDefaults.AuthenticationScheme);
         policy.RequireAuthenticatedUser();
     });
-});*/
+});
 
 
 /** ENABLE SSO **/
 
-/*builder.Services.AddAuthentication(options =>
+builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = GoogleDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
@@ -95,7 +95,7 @@ builder.Services.AddAuthentication(auth =>
 {
     options.ClientId = "600543089869-plavm2lirv6k30ti8mf76rgeicu28tr2.apps.googleusercontent.com";
     options.ClientSecret = "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";
-});*/
+});
 
 /**DEPENDENCY INJECTIONS* */
 builder.Services.AddAutoMapper(typeof(AutoMapping).Assembly);

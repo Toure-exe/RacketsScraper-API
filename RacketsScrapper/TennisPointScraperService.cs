@@ -14,6 +14,11 @@ namespace RacketsScrapper.Application
 {
     public class TennisPointScraperService : IRacketScraperService
     {
+        /*
+         *  tennis-point ha cambiato la struttura del proprio codice HTML (id, div, ecc...), per cui tutte le XPATH 
+         *  vanno aggiornate
+         * 
+         */
         private readonly List<string> links;
         public string CurruentPageCode { get; set; }
         private readonly IDownloaderService _downloaderService;
@@ -57,6 +62,7 @@ namespace RacketsScrapper.Application
            
             foreach(string url in this.links)
             {
+                Console.WriteLine("CURRENT URL: "+ url);
                 Racket racket = new Racket();
                 racket.Url = url;
                 string detailPage = _downloaderService.DownloadHtmlAsync(url).Result;
@@ -65,49 +71,59 @@ namespace RacketsScrapper.Application
                 HtmlNode detailNode = doc.DocumentNode.SelectSingleNode("//*[@itemprop=\"image\"]/@href");
                 HtmlAttribute attribute = detailNode.Attributes["href"];
                 racket.ImageLink = attribute.Value;
-                detailNode = doc.DocumentNode.SelectSingleNode("//*[@itemprop=\"price\"]/@content");
-                price = detailNode.Attributes["content"].Value;
-                racket.Prezzo = double.Parse(price, CultureInfo.InvariantCulture);
-                if(doc.DocumentNode.SelectNodes("/html/body/div[1]/div[3]/div[2]/div[3]/div/div[1]/div/span[1]/span/span").Count > 1)
+                detailNode = doc.DocumentNode.SelectSingleNode("//*[@itemprop=\"price\"]");
+                if (detailNode == null)
+                    detailNode = doc.DocumentNode.SelectSingleNode("//*[@id=\"js-pdp-redesign\"]/div[2]/div[2]/div/div/div[3]/div/div/div[1]/span");
+                price = detailNode.InnerText;
+                racket.Prezzo = double.Parse(price.Replace("&euro;", string.Empty).Replace(",", "."), CultureInfo.InvariantCulture);
+                /*if(doc.DocumentNode.SelectNodes("/html/body/div[1]/div[3]/div[2]/div[3]/div/div[1]/div/span[1]/span/span").Count > 1)
                 {
                     detailNode = doc.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div[2]/div[3]/div/div[1]/div/span[1]/span[1]/span");
                     if (detailNode != null)
                         racket.VecchioPrezzo = double.Parse(detailNode.InnerText.Replace("&euro;", string.Empty).Replace(",", "."), CultureInfo.InvariantCulture);
-                }
-                
-                    
-                detailNode = doc.DocumentNode.SelectSingleNode("//*[@class =\"attr-value product-id\"]");          
-                racket.NumeroArticolo = detailNode.InnerText;
-                detailNode = doc.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div[2]/div[1]/div/div[1]/div/h1/span[1]/span");
+                }*/
+               detailNode = doc.DocumentNode.SelectSingleNode("//*[@class=\"strike-through old-price list\"]/span");
+               if(detailNode != null)
+                    racket.VecchioPrezzo = double.Parse(detailNode.InnerText.Replace("&euro;", string.Empty).Replace(",", "."), CultureInfo.InvariantCulture);
+
+                detailNode = doc.DocumentNode.SelectSingleNode("//*[@class=\"js-article-no\"]"); 
+                if(detailNode != null)
+                    racket.NumeroArticolo = detailNode.InnerText;
+
+                detailNode = doc.DocumentNode.SelectSingleNode("//*[@itemprop=\"brand\"]/span");
                 racket.Marca = detailNode.InnerText;
-                detailNode = doc.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div[2]/div[1]/div/div[1]/div/h1/span[2]");
-                racket.Modello = detailNode.InnerText;
+                var tempModello = doc.DocumentNode.SelectNodes("//*[@itemprop=\"name\"]");
+                racket.Modello = tempModello.ElementAt(tempModello.Count - 1).InnerText;
                 //
-                var listNodes = doc.DocumentNode.SelectNodes("//*[@id=\"tabAttributes\"]/div/div[5]/ul/ul/li/span");
-                for (int i = 0; i < listNodes.Count-2; i += 2)
+                var listNodesTitles = doc.DocumentNode.SelectNodes("//*[@class=\"highlight-item-content\"]/span");
+                var listNodesValues = doc.DocumentNode.SelectNodes("//*[@class=\"highlight-item-value\"]");
+                for (int i = 0; i < listNodesTitles.Count; i++)
                 {
-                    switch (listNodes.ElementAt(i).InnerText)
+                    switch (listNodesTitles.ElementAt(i).InnerText)
                     {
                         case "Tipo di prodotto":
-                            racket.TipoDiProdotto = listNodes.ElementAt(i+1).InnerText.Trim();
+                            racket.TipoDiProdotto = listNodesValues.ElementAt(i).InnerText.Trim();
                             break;
                         case "Sesso":
-                            racket.Sesso = listNodes.ElementAt(i + 1).InnerText.Trim();
+                            racket.Sesso = listNodesValues.ElementAt(i).InnerText.Trim();
                             break;
                         case "1. colore":
-                            racket.ColoreUno = listNodes.ElementAt(i + 1).InnerText.Trim();
+                            racket.ColoreUno = listNodesValues.ElementAt(i).InnerText.Trim();
                             break;
                         case "2. colore":
-                            racket.ColoreDue = listNodes.ElementAt(i + 1).InnerText.Trim();
+                            racket.ColoreDue = listNodesValues.ElementAt(i).InnerText.Trim();
                             break;
                         case "Profilo (mm)":
-                            racket.Profilo = int.Parse(listNodes.ElementAt(i + 1).InnerText.Trim());
+                            racket.Profilo = int.Parse(listNodesValues.ElementAt(i).InnerText.Trim());
                             break;
-                        case "Lunghezza (mm)":
-                            racket.Lunghezza = listNodes.ElementAt(i + 1).InnerText.Trim();
+                        case "Lunghezza":
+                            racket.Lunghezza = listNodesValues.ElementAt(i).InnerText.Trim();
                             break;
                         case "Peso":
-                            racket.Peso = listNodes.ElementAt(i + 1).InnerText.Trim();
+                            racket.Peso = listNodesValues.ElementAt(i).InnerText.Trim();
+                            break;
+                        case "Bilanciamento":
+                            racket.Bilanciamento = listNodesValues.ElementAt(i).InnerText.Trim();
                             break;
                         default: break;
                     }

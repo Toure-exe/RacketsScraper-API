@@ -21,9 +21,12 @@ namespace RacketScrapper.API.Tasks
                 {
                     var serviceDispatcher = scope.ServiceProvider.GetService<IServiceDispatcher>();
                     var racketCrudService = scope.ServiceProvider.GetService<IRacketCrudService>();
-                   /* racketCrudService.DeleteAllRackets();
-                    serviceDispatcher.RunTennisPointScraper();
-                    serviceDispatcher.RunPadelNuestroScraper();*/
+                    List<Task> tasks = new List<Task>();
+                   /* tasks.Add(Task.Run(() => serviceDispatcher.RunTennisPointScraper()));
+                    tasks.Add(Task.Run(() => serviceDispatcher.RunPadelNuestroScraper()));
+                    await Task.WhenAll(tasks);*/
+                    
+                   /* racketCrudService.DeleteAllRackets();*/
                     _logger.LogInformation($"E' stato aggiornato il database eseguendo gli scraper il: {DateTime.Now} ");
                     await Task.Delay(TimeSpan.FromDays(1), stoppingToken);
 
