@@ -3,15 +3,14 @@ using IdentityServer4.Models;
 using IdentityServer4.Test;
 using System.Security.Claims;
 
-namespace IdentityServer
+namespace RacketScraper.IdentityServer
 {
     public class Config
     {
 
-
         public static List<TestUser> TestUsers =>
-        new List<TestUser>
-        {
+      new List<TestUser>
+      {
             new TestUser
             {
                 SubjectId = "1144",
@@ -25,7 +24,7 @@ namespace IdentityServer
                     new Claim(JwtClaimTypes.Email, "real-admin@exemple.com"),
                 }
             }
-         };
+       };
 
         public static IEnumerable<IdentityResource> IdentityResources =>
         new IdentityResource[]
@@ -65,35 +64,5 @@ namespace IdentityServer
                 AllowedScopes = { "racketEngine.read" }
             },
         };
-
-
-       /* public static IEnumerable<ApiResource> GetApiResources()
-        {
-            List<ApiResource> resources = new List<ApiResource>();
-           // ApiScope scope = new ApiScope("apiscope");
-            ApiResource resource = new ApiResource("myresourceapi", "My Resource API");
-            resource.Scopes.Add("apiscope");
-
-           return resources;
-        }*/
-
-       /* public static IEnumerable<Client> GetClients()
-        {
-            return new[]
-            {
-                // for public api
-                new Client
-                {
-                    ClientId = "secret_client_id",
-                    AllowedGrantTypes = GrantTypes.ClientCredentials,
-                    ClientSecrets =
-                    {
-                        new Secret("secret".Sha256())
-                    },
-                    AllowedScopes = { "apiscope" }
-                }
-            };
-        }*/
-
     }
 }

@@ -46,10 +46,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 /** ENABLE JWT **/
-builder.Services.AddIdentity<User, IdentityRole>();
+//builder.Services.AddIdentity<User, IdentityRole>();
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 string? key = Environment.GetEnvironmentVariable("RACKET_KEY");
-builder.Services.AddAuthentication(auth =>
+/*builder.Services.AddAuthentication(auth =>
 {
     auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -65,11 +65,18 @@ builder.Services.AddAuthentication(auth =>
         ValidAudience = jwtSettings.GetSection("Audience").Value,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
     };
-});
+});*/
+
+builder.Services.AddAuthentication("Bearer")
+    .AddIdentityServerAuthentication("Bearer", options =>
+    {
+        options.ApiName = "racketEngine";
+        options.Authority = "https://localhost:7011";
+    });
 
 
 
-builder.Services.AddAuthorization(options =>
+/*builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("JWT", policy =>
     {
@@ -82,12 +89,12 @@ builder.Services.AddAuthorization(options =>
         policy.AuthenticationSchemes.Add(GoogleDefaults.AuthenticationScheme);
         policy.RequireAuthenticatedUser();
     });
-});
+});*/
 
 
 /** ENABLE SSO **/
 
-builder.Services.AddAuthentication(options =>
+/*builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = GoogleDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
@@ -95,7 +102,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.ClientId = "600543089869-plavm2lirv6k30ti8mf76rgeicu28tr2.apps.googleusercontent.com";
     options.ClientSecret = "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";
-});
+});*/
 
 /**DEPENDENCY INJECTIONS* */
 builder.Services.AddAutoMapper(typeof(AutoMapping).Assembly);
