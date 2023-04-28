@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Google;
 using RacketScraper.IdentityServer;
 using RacketScraper.IdentityServer.Services;
 using RacketsScrapper.Domain.Identity;
@@ -26,10 +27,16 @@ builder.Services.AddDbContext<RacketDbContext>(opt
     => opt.UseSqlServer(builder.Configuration.GetConnectionString("DbString")));
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-builder.Services.AddAuthentication();
+
 var identityBuilder = builder.Services.AddIdentityCore<User>(opt => opt.User.RequireUniqueEmail = true);
 identityBuilder = new IdentityBuilder(identityBuilder.UserType, typeof(IdentityRole), builder.Services);
 identityBuilder.AddEntityFrameworkStores<RacketDbContext>().AddDefaultTokenProviders();
+
+builder.Services.AddAuthentication().AddGoogle(options =>
+{
+    options.ClientId = "600543089869-plavm2lirv6k30ti8mf76rgeicu28tr2.apps.googleusercontent.com";
+    options.ClientSecret = "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";
+});
 
 builder.Services.AddIdentity<User, IdentityRole>();
 builder.Services.AddAutoMapper(typeof(AutoMapping).Assembly);

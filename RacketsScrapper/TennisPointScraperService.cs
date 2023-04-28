@@ -3,7 +3,6 @@ using RacketsScrapper.Domain;
 using RacketsScrapper.Infrastructure;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -15,11 +14,6 @@ namespace RacketsScrapper.Application
 {
     public class TennisPointScraperService : IRacketScraperService
     {
-        /*
-         *  tennis-point ha cambiato la struttura del proprio codice HTML (id, div, ecc...), per cui tutte le XPATH 
-         *  vanno aggiornate
-         * 
-         */
         private readonly List<string> links;
         public string CurruentPageCode { get; set; }
         private readonly IDownloaderService _downloaderService;
@@ -50,72 +44,74 @@ namespace RacketsScrapper.Application
             doc.LoadHtml(CurruentPageCode);
 
             foreach (HtmlNode linkNode in
-                doc.DocumentNode.SelectNodes("//*[@id=\"productList\"]/div/div/div[2]/div[2]/div[3]/a[@href]")) 
+                doc.DocumentNode.SelectNodes("//*[@id=\"productList\"]/div/div/div[2]/div[2]/div[3]/a[@href]"))
             {
                 HtmlAttribute attribute = linkNode.Attributes["href"];
-                links.Add("https://www.tennis-point.it"+attribute.Value);
+                links.Add("https://www.tennis-point.it" + attribute.Value);
             }
         }
 
         public void TakeRacketsData()
         {
             string price = "";
-           
-            foreach(string url in this.links)
+
+            foreach (string url in this.links)
             {
-                Console.WriteLine("CURRENT URL: "+ url);
                 Racket racket = new Racket();
                 racket.Url = url;
                 string detailPage = _downloaderService.DownloadHtmlAsync(url).Result;
                 HtmlDocument doc = new HtmlDocument();
-
                 doc.LoadHtml(detailPage);
                 HtmlNode detailNode = doc.DocumentNode.SelectSingleNode("//*[@itemprop=\"image\"]/@href");
                 HtmlAttribute attribute = detailNode.Attributes["href"];
                 racket.ImageLink = attribute.Value;
-                detailNode = doc.DocumentNode.SelectSingleNode("//*[@itemprop=\"price\"]");
-                if (detailNode == null)
-                    detailNode = doc.DocumentNode.SelectSingleNode("//*[@id=\"js-pdp-redesign\"]/div[2]/div[2]/div/div/div[3]/div/div/div[1]/span");
-                price = detailNode.InnerText;
-                racket.Prezzo = double.Parse(price.Replace("&euro;", string.Empty).Replace(",", "."), CultureInfo.InvariantCulture);
+                detailNode = doc.DocumentNode.SelectSingleNode("//*[@itemprop=\"price\"]/@content");
+                price = detailNode.Attributes["content"].Value;
+                racket.Prezzo = double.Parse(price, CultureInfo.InvariantCulture);
+                //if (doc.DocumentNode.SelectNodes("/html/body/div[1]/div[3]/div[2]/div[3]/div/div[1]/div/span[1]/span/span").Count > 1)
+                //{
+                    detailNode = doc.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div[2]/div[3]/div/div[1]/div/span[1]/span[1]/span");
+                    if (detailNode != null)
+                        racket.VecchioPrezzo = double.Parse(detailNode.InnerText.Replace("&euro;", string.Empty).Replace(",", "."), CultureInfo.InvariantCulture);
+                //}
 
-               detailNode = doc.DocumentNode.SelectSingleNode("//*[@class=\"strike-through old-price list\"]/span");
-               if(detailNode != null)
-                    racket.VecchioPrezzo = double.Parse(detailNode.InnerText.Replace("&euro;", string.Empty).Replace(",", "."), CultureInfo.InvariantCulture);
 
-                detailNode = doc.DocumentNode.SelectSingleNode("//*[@class=\"js-article-no\"]"); 
-                if(detailNode != null)
-                    racket.NumeroArticolo = detailNode.InnerText;
-
-                detailNode = doc.DocumentNode.SelectSingleNode("//*[@itemprop=\"brand\"]/span");
+                detailNode = doc.DocumentNode.SelectSingleNode("//*[@class =\"attr-value product-id\"]");
+                racket.NumeroArticolo = detailNode.InnerText;
+                detailNode = doc.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div[2]/div[1]/div/div[1]/div/h1/span[1]/span");
                 racket.Marca = detailNode.InnerText;
-                var tempModello = doc.DocumentNode.SelectNodes("//*[@itemprop=\"name\"]");
-                racket.Modello = tempModello.ElementAt(tempModello.Count - 1).InnerText;
-                detailNode = doc.DocumentNode.SelectSingleNode("/html/head/meta[6]/@content");
-                var description = detailNode.Attributes["content"].Value.Split("-");
-                foreach(string desc in description)
+                detailNode = doc.DocumentNode.SelectSingleNode("/html/body/div[1]/div[3]/div[2]/div[1]/div/div[1]/div/h1/span[2]");
+                racket.Modello = detailNode.InnerText;
+                //
+                var listNodes = doc.DocumentNode.SelectNodes("//*[@id=\"tabAttributes\"]/div/div[5]/ul/ul/li/span");
+                for (int i = 0; i < listNodes.Count - 2; i += 2)
                 {
-                    if (desc.Contains("colore"))
+                    switch (listNodes.ElementAt(i).InnerText)
                     {
-                        var value = desc.Split(":");
-                        racket.ColoreUno = value[1].Trim();
-                    }
-                    else if (desc.Contains("Profilo"))
-                    {
-                        var value = desc.Split(":");
-                        racket.Profilo = int.Parse(value[1].Trim(), CultureInfo.InvariantCulture);
-                    }
-                    else if (desc.Contains("Peso"))
-                    {
-                        var value = desc.Split(":");
-                        racket.Peso = value[1].Trim();
-                    }
-                    else if (desc.Contains("Unisex") || desc.Contains("Uomini") || desc.Contains("Donna") || desc.Contains("Bambini"))
-                    {
-                        racket.Sesso = desc.Trim();
+                        case "Tipo di prodotto":
+                            racket.TipoDiProdotto = listNodes.ElementAt(i + 1).InnerText.Trim();
+                            break;
+                        case "Sesso":
+                            racket.Sesso = listNodes.ElementAt(i + 1).InnerText.Trim();
+                            break;
+                        case "1. colore":
+                            racket.ColoreUno = listNodes.ElementAt(i + 1).InnerText.Trim();
+                            break;
+                        case "2. colore":
+                            racket.ColoreDue = listNodes.ElementAt(i + 1).InnerText.Trim();
+                            break;
+                        case "Profilo (mm)":
+                            racket.Profilo = int.Parse(listNodes.ElementAt(i + 1).InnerText.Trim());
+                            break;
+                        case "Lunghezza (mm)":
+                            racket.Lunghezza = listNodes.ElementAt(i + 1).InnerText.Trim();
+                            break;
+                        case "Peso":
+                            racket.Peso = listNodes.ElementAt(i + 1).InnerText.Trim();
+                            break;
+                        default: break;
                     }
                 }
-                //
                 Console.WriteLine($"--> {racket.Prezzo}, img: {racket.ImageLink}, tipo: {racket.TipoDiProdotto}, num: {racket.NumeroArticolo}, colore 1:{racket.ColoreUno}, peso: {racket.Peso} \n\n");
                 _racketRepository.InsertRacket(racket);
 
@@ -135,12 +131,12 @@ namespace RacketsScrapper.Application
             {
                 next = doc.DocumentNode.SelectSingleNode("//*[@id=\"productList\"]/div[37]/div/div[2]/nav/ul/li[7]/a/@href");
             }
-           
+
             if (next != null)
             {
                 return (next.Attributes["href"]).Value;
             }
-            else 
+            else
             {
                 return null;
             }

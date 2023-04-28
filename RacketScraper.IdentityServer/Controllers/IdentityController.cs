@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using RacketScraper.IdentityServer.Services;
 using RacketsScrapper.Domain;
 using RacketsScrapper.Domain.Identity;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace RacketScraper.IdentityServer.Controllers
 {
@@ -16,13 +20,15 @@ namespace RacketScraper.IdentityServer.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IMapper _mapper;
         private readonly IAuthService _authService;
+        private readonly IConfiguration _config;
         public IdentityController(UserManager<User> userManager, IMapper mapper, IAuthService authService,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager, IConfiguration configuration)
         {
             _userManager = userManager;
             _mapper = mapper;
             _authService = authService;
             _roleManager = roleManager;
+            _config = configuration;
         }
 
         [HttpPost("register")]
@@ -92,5 +98,23 @@ namespace RacketScraper.IdentityServer.Controllers
             }
 
         }
+
+        [HttpPost("auth-google")]
+        public async Task<IActionResult> GoogleAuth([FromBody] string credentials)
+        {
+            var settings = new GoogleJsonWebSignature.ValidationSettings()
+            {
+                Audience = new List<string> { _config.GetSection("GoogleInfo").GetSection("clientId").Value }
+            };
+
+            var payload = await GoogleJsonWebSignature.ValidateAsync(credentials, settings);
+
+            string jwt = _authService.GetToken(payload);
+
+            return Ok(jwt);
+            
+        }
+
+    
     }
 }

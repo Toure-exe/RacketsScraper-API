@@ -7,7 +7,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RacketScrapper.API;
-using RacketScrapper.API.Services;
 using RacketScrapper.API.Tasks;
 using RacketsScrapper.Application;
 using RacketsScrapper.Domain.Identity;
@@ -106,7 +105,6 @@ builder.Services.AddAuthentication("Bearer")
 
 /**DEPENDENCY INJECTIONS* */
 builder.Services.AddAutoMapper(typeof(AutoMapping).Assembly);
-builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRacketsRepository, RacketRepository>();
 builder.Services.AddScoped<IRacketScraperService, TennisPointScraperService>();
 builder.Services.AddScoped<IRacketScraperService, PadelNuestroScraperService>();
